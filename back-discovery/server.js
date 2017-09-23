@@ -7,8 +7,8 @@ const client = new Wit({
   accessToken: "F3GLVWDI3U5US6FNMO57X3JIFT7ASNZH"
 });
 
-const noresponse = [{"message": "Sorry I don't know about that yet. Try Google, they're a little smarter :)"}]; 
-const templateresponse = [{"message": "", "embed": {"message": "", "url": ""}, "suggest": []}]; 
+const noresponse = {"message": "Sorry I don't know about that yet. Try Google, they're a little smarter :)"}; 
+const templateresponse = {"message": "", "embed": {"message": "", "url": ""}, "suggestions": []}; 
 
 //your routes here
 app.get('/:message', function (req, res) {
@@ -27,7 +27,7 @@ app.get('/:message', function (req, res) {
 			} else {
 				obj = search_results[0]; 
 			}
-			console.log("https://learn-anything.xyz/api/maps/" + obj.id)
+			
 			got("https://learn-anything.xyz/api/maps/" + obj.id)
 			.then(map_response => {
 				// compile the results
@@ -35,15 +35,21 @@ app.get('/:message', function (req, res) {
 				var returnmessage = templateresponse; 
 				
 				let wikinode = map_results.nodes.find(o => o.category === 'wiki');
-				returnmessage.message = "Find out more about " + obj.key + " here: " + wikinode.url;
+				if (wikinode) {
+					returnmessage.message = "Find out more about " + obj.key + " here: " + wikinode.url;
+				} else {
+					returnmessage.message = obj.key + " is cool"
+				}
 
 				let preembednode = map_results.nodes.find(o => o.text === 'basics'); 
 				let embednode = preembednode.nodes.find(o => o.category === 'video');
-				returnmessage.embed.message = "Check out this video: " + embednode.text; 
-				returnmessage.embed.url = embednode.url; 
+				if (embednode) {
+					returnmessage.embed.message = "Check out this video!"; 
+					returnmessage.embed.url = embednode.url; 
+				}
 
 				let suggestnodes = map_results.nodes.filter( o => o.category == 'mindmap' );
-				for (node in suggestnodes) { returnmessage.suggest.push({"title": node.text, "url": node.url}) }
+				for (num in suggestnodes) { returnmessage.suggestions.push({"title": suggestnodes[num].text, "url": suggestnodes[num].url}) }
 
 				// send it back
 				console.log(returnmessage)
@@ -51,12 +57,12 @@ app.get('/:message', function (req, res) {
 
 			}).catch(search_error => {
 				console.log("Map API Error");
-				console.log(error.response.body);
+				console.log(search_error);
 			});
 
 		}).catch(search_error => {
 			console.log("Search API Error");
-			console.log(error.response.body);
+			console.log(search_error);
 		});
 	})
 	.catch(console.error);
