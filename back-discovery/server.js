@@ -8,7 +8,7 @@ const client = new Wit({
 });
 
 const noresponse = {"message": "Sorry I don't know about that yet. Try Google, they're a little smarter :)"}; 
-const templateresponse = {"message": "", "embed": {"message": "", "url": ""}, "suggestions": []}; 
+const templateresponse = {"message": "", "embed": {"message": "", "url": ""}, "suggestions": ""}; 
 
 //your routes here
 app.get('/:message', function (req, res) {
@@ -50,7 +50,8 @@ app.get('/:message', function (req, res) {
 				}
 
 				let suggestnodes = map_results.nodes.filter( o => o.category == 'mindmap' );
-				for (num in suggestnodes) { returnmessage.suggestions.push({"title": suggestnodes[num].text, "url": suggestnodes[num].url}) }
+				returnmessage.suggestions = "Look up stuff about "
+				for (num in suggestnodes) { returnmessage.suggestions + suggestnodes[num].text + ", " }
 
 				// send it back
 				console.log(returnmessage)

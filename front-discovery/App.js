@@ -1,62 +1,124 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import ChatBot from 'react-native-chatbot';
-
-
-
-var steps = [
-                { id: 'start',
-                  message: 'What would you like to learn about?',
-                  trigger: 'search',
-                },{ id: 'search', 
-                  user: true, 
-                  trigger: 'send' //next_steps()
-                },{ id: 'send', 
-                  message: get_message({previousValue}), 
-                  trigger: suggestionsOrComponent({previousValue})
-                }
-            ];
-var next = null; 
-var nextnext = null; 
-
-function get_message(question) {
-  const response = await fetch("https://slackifyapp.burnished12.hasura-app.io/" + question); 
-  const message_object = await response.text(); 
-  if (message_object) {
-    // const templateresponse = {"message": "", "embed": {"message": "", "url": ""}, "suggestions": []}; 
-    var message = message_object.message; 
-
-    if (message_object.embed.message != "" && message_object.embed.url != "") {
-      // set next to be this embed 
-      next = message_object.embed; 
-    }
-
-    if (message_object.suggestions.length > 0) {
-      // set nextnext to be this suggest.
-      nextnext = message_object.suggest
-    }
-  } else {
-    console.log("hasura-app, message_object didn't work"); 
-  }
-
-  return message; 
-}
-
-function suggestionsOrComponent() {
-
-  return 'start'
-}
-
+import { GiftedChat } from 'react-native-gifted-chat';
 
 export default class App extends React.Component {
 
+ state = {
+    messages: [],
+  };
+
+  componentWillMount() {
+    this.setState({
+      messages: [
+        {
+          _id: 1,
+          text: 'Hello developer',
+          createdAt: new Date(),
+          user: {
+            _id: 2,
+            name: 'React Native',
+            avatar: 'https://facebook.github.io/react/img/logo_og.png',
+          },
+        },
+      ],
+    });
+  }
+
+  onSend(messages = []) {
+    this.setState((previousState) => ({
+      messages: GiftedChat.append(previousState.messages, messages),
+    }));
+
+    try {
+      responseText = this.sendtoserver(messages[0].text); 
+      // console.log(responseText)
+    } catch (error) {
+      console.log(error); 
+    }
+
+  }
+
+  async sendtoserver(text) {
+    const response = await fetch("https://discovery.burst16.hasura-app.io/" + encodeURI(text)); 
+    const responseText = await response.text(); 
+    if (responseText) {
+      var data = JSON.parse(responseText)
+      var numofmessages = this.state.messages.length; 
+      
+      var message = {
+          _id: numofmessages+1,
+          text: data.message,
+          createdAt: new Date(),
+          user: {
+            _id: 2,
+            name: 'React Native',
+            avatar: 'https://facebook.github.io/react/img/logo_og.png',
+          },
+        }
+
+      this.setState((previousState) => ({
+        messages: GiftedChat.append(previousState.messages, message),
+      }));
+
+
+      if (data.embed.message.length > 0) {
+        var embedmessage = {
+          _id: numofmessages+2,
+          text: data.embed.message + " " + data.embed.url,
+          createdAt: new Date(),
+          user: {
+            _id: 2,
+            name: 'React Native',
+            avatar: 'https://facebook.github.io/react/img/logo_og.png',
+          },
+        }
+
+        this.setState((previousState) => ({
+          messages: GiftedChat.append(previousState.messages, embedmessage),
+        }))
+      }
+
+      console.log(data.suggestions)
+      if (data.suggestions > 0) {
+        var suggestionmessage = {
+          _id: numofmessages+3,
+          text: data.suggestions,
+          createdAt: new Date(),
+          user: {
+            _id: 2,
+            name: 'React Native',
+            avatar: 'https://facebook.github.io/react/img/logo_og.png',
+          },
+        }
+
+        this.setState((previousState) => ({
+          messages: GiftedChat.append(previousState.messages, suggestionmessage),
+        }))
+      }
+
+      // console.log(this.state.messages)
+
+    } else {
+      console.log("async error"); 
+    }
+  }
 
   render() {
-    return (<View style={styles.container}>
-                <ChatBot steps={steps} />
-            </View> );
+    return (
+      <GiftedChat
+        messages={this.state.messages}
+        onSend={(messages) => this.onSend(messages)}
+        user={{
+          _id: 1,
+        }}
+      />
+    )
   }
 }
+
+
+
 
 const styles = StyleSheet.create({
   container: {

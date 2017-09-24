@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "discovery",
+    "name": "front-discovery",
     "description": "An empty new project",
-    "slug": "discovery",
+    "slug": "front-discovery",
     "privacy": "public",
     "sdkVersion": "21.0.0",
     "version": "1.0.0",
