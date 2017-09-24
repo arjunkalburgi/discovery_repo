@@ -97,6 +97,8 @@ export default class App extends React.Component {
         }))
       }
 
+      data = null
+
       // console.log(this.state.messages)
 
     } else {

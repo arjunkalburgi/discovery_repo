@@ -34,6 +34,7 @@ app.get('/:message', function (req, res) {
 				// compile the results
 				var map_results = JSON.parse(map_response.body); 
 				var returnmessage = templateresponse; 
+				returnmessage.suggestions = ""; 
 				
 				let wikinode = map_results.nodes.find(o => o.category === 'wiki');
 				if (wikinode) {
@@ -61,6 +62,7 @@ app.get('/:message', function (req, res) {
 				// send it back
 				console.log(returnmessage)
 				res.send(returnmessage); 
+				returnmessage = null
 
 			}).catch(search_error => {
 				console.log("Map API Error");
