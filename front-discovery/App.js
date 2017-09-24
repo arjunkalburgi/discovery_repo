@@ -12,16 +12,38 @@ var steps = [
                   user: true, 
                   trigger: 'send' //next_steps()
                 },{ id: 'send', 
-                  message: get_message(), 
-                  trigger: suggestions()
+                  message: get_message({previousValue}), 
+                  trigger: suggestionsOrComponent({previousValue})
                 }
             ];
+var next = null; 
+var nextnext = null; 
 
-function get_message() {
-  return "hiiiiii"
+function get_message(question) {
+  const response = await fetch("https://slackifyapp.burnished12.hasura-app.io/" + question); 
+  const message_object = await response.text(); 
+  if (message_object) {
+    // const templateresponse = {"message": "", "embed": {"message": "", "url": ""}, "suggestions": []}; 
+    var message = message_object.message; 
+
+    if (message_object.embed.message != "" && message_object.embed.url != "") {
+      // set next to be this embed 
+      next = message_object.embed; 
+    }
+
+    if (message_object.suggestions.length > 0) {
+      // set nextnext to be this suggest.
+      nextnext = message_object.suggest
+    }
+  } else {
+    console.log("hasura-app, message_object didn't work"); 
+  }
+
+  return message; 
 }
 
-function suggestions() {
+function suggestionsOrComponent() {
+
   return 'start'
 }
 

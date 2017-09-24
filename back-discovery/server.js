@@ -23,7 +23,8 @@ app.get('/:message', function (req, res) {
 			var search_results = JSON.parse(search_response.body); 
 			var obj; 
 			if (search_results.length == 0) {
-				obj = noresponse; 
+				res.send(noresponse);
+				return  
 			} else {
 				obj = search_results[0]; 
 			}
