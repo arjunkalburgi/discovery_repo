@@ -80,7 +80,7 @@ export default class App extends React.Component {
       }
 
       console.log(data.suggestions)
-      if (data.suggestions > 0) {
+      if (data.suggestions.length > 0) {
         var suggestionmessage = {
           _id: numofmessages+3,
           text: data.suggestions,
