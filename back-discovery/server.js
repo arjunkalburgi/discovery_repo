@@ -50,9 +50,12 @@ app.get('/:message', function (req, res) {
 				}
 
 				let suggestnodes = map_results.nodes.filter( o => o.category == 'mindmap' );
-				returnmessage.suggestions = "Look up stuff about "
-				for (num in suggestnodes) { returnmessage.suggestions + suggestnodes[num].text + ", " }
-
+				console.log(suggestnodes)
+				if (suggestnodes.lenth > 0) {
+					returnmessage.suggestions = "Look up stuff about "
+					for (num in suggestnodes) { returnmessage.suggestions = returnmessage.suggestions + suggestnodes[num].text + ", "; console.log(returnmessage.suggestions) }
+				}
+				
 				// send it back
 				console.log(returnmessage)
 				res.send(returnmessage); 
