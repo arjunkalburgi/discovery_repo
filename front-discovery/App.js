@@ -13,7 +13,7 @@ export default class App extends React.Component {
       messages: [
         {
           _id: 1,
-          text: 'Hello developer',
+          text: 'Hello learner',
           createdAt: new Date(),
           user: {
             _id: 2,
